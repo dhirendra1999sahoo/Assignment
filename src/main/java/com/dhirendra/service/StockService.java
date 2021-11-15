@@ -3,6 +3,7 @@ package com.dhirendra.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import javax.transaction.Transactional;
 
@@ -16,11 +17,12 @@ import com.dhirendra.exception.StockException;
 import com.dhirendra.repository.StockRepository;
 
 import lombok.extern.slf4j.Slf4j;
+
 /**
  * Performing operations on Stocks
  * 
  * 
- * @author 
+ * @author
  *
  */
 @Slf4j
@@ -80,9 +82,9 @@ public class StockService {
 	}
 
 	@Transactional
-	public void removeStock(long id) {
+	public void removeStock(long id) throws InterruptedException {
 		try {
-
+			TimeUnit.MINUTES.sleep(5);
 			stockRepository.deleteById(id);
 
 		} catch (StockException e) {
@@ -97,4 +99,15 @@ public class StockService {
 		return stockRepository.findStockByName(stock.getName()) != null;
 	}
 
+	@Transactional
+	public com.dhirendra.model.Stock updatePrice(Stock currentStock) {
+		Stock stock = stockRepository.save(currentStock);
+		return conversionService.convert(stock, com.dhirendra.model.Stock.class);
+
+	}
+
+	public Stock getSingleStock(long id) {
+
+		return stockRepository.getById(id);
+	}
 }
