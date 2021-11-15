@@ -23,11 +23,12 @@ import com.dhirendra.model.Stock;
 import com.dhirendra.service.StockService;
 
 import lombok.extern.slf4j.Slf4j;
+
 /**
  * Contains all the APIs for different operations
  * 
  * 
- * @author 
+ * @author
  *
  */
 @Slf4j
@@ -109,7 +110,7 @@ public class StockController extends AbstractBaseRestController {
 	public ResponseEntity<?> updateStockPrice(@PathVariable("id") long id, Double price) {
 		log.info("Updating Stock with id {}", id);
 
-		Stock currentStock = stockService.getStock(id);
+		com.dhirendra.entity.Stock currentStock = stockService.getSingleStock(id);
 
 		if (currentStock == null) {
 			log.error("Unable to update. Stock with id {} not found.", id);
@@ -117,6 +118,7 @@ public class StockController extends AbstractBaseRestController {
 		}
 
 		currentStock.setCurrentPrice(price);
+		stockService.updatePrice(currentStock);
 		return createResponse(currentStock, HttpStatus.OK);
 
 	}
@@ -127,10 +129,11 @@ public class StockController extends AbstractBaseRestController {
 	 * 
 	 * @param id
 	 * @return
+	 * @throws Exception
 	 */
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> removeStock(@PathVariable("id") long id) {
+	public ResponseEntity<?> removeStock(@PathVariable("id") long id) throws Exception {
 		log.info("Fetching & Deleting Stock with id {}", id);
 		Stock stock = stockService.getStock(id);
 		if (stock == null) {
