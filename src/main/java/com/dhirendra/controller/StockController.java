@@ -23,7 +23,13 @@ import com.dhirendra.model.Stock;
 import com.dhirendra.service.StockService;
 
 import lombok.extern.slf4j.Slf4j;
-
+/**
+ * Contains all the APIs for different operations
+ * 
+ * 
+ * @author 
+ *
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/stocks")
@@ -48,6 +54,7 @@ public class StockController extends AbstractBaseRestController {
 	}
 
 	/**
+	 * create a stock
 	 * 
 	 * @param stock
 	 * @param ucBuilder
@@ -71,6 +78,7 @@ public class StockController extends AbstractBaseRestController {
 	}
 
 	/**
+	 * get one stock from the list
 	 * 
 	 * @param id
 	 * @return
@@ -90,6 +98,7 @@ public class StockController extends AbstractBaseRestController {
 	}
 
 	/**
+	 * update the price of a single stock
 	 * 
 	 * @param id
 	 * @param price
@@ -113,6 +122,8 @@ public class StockController extends AbstractBaseRestController {
 	}
 
 	/**
+	 * 
+	 * delete a single stock
 	 * 
 	 * @param id
 	 * @return
