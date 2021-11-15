@@ -12,8 +12,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.dhirendra.entity.Stock;
+import com.dhirendra.exception.StockException;
 import com.dhirendra.repository.StockRepository;
 
+import lombok.extern.slf4j.Slf4j;
+/**
+ * Performing operations on Stocks
+ * 
+ * 
+ * @author 
+ *
+ */
+@Slf4j
 @Service
 public class StockService {
 
@@ -34,8 +44,12 @@ public class StockService {
 						.forEach(obj -> stocks.add(conversionService.convert(obj, com.dhirendra.model.Stock.class)));
 
 			}
+		} catch (StockException e) {
+			log.error("getAllStocks :: There was an StockException exception in the Stock service");
+			throw e;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("getAllStocks :: There was an unknown exception");
+			throw e;
 		}
 		return stocks;
 	}
@@ -54,8 +68,12 @@ public class StockService {
 			if (singleStock.isPresent()) {
 				stock = conversionService.convert(singleStock.get(), com.dhirendra.model.Stock.class);
 			}
+		} catch (StockException e) {
+			log.error("getStock :: There was an StockException exception in the Stock service");
+			throw e;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("getStock :: There was an unknown exception");
+			throw e;
 		}
 		return stock;
 
@@ -67,8 +85,10 @@ public class StockService {
 
 			stockRepository.deleteById(id);
 
+		} catch (StockException e) {
+			throw e;
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw e;
 		}
 
 	}
