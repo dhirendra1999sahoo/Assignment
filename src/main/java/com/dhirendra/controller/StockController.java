@@ -104,22 +104,19 @@ public class StockController extends AbstractBaseRestController {
 	 * @param id
 	 * @param price
 	 * @return
+	 * @throws InterruptedException
 	 */
 
-	@PutMapping("/{id}")
-	public ResponseEntity<?> updateStockPrice(@PathVariable("id") long id, Double price) {
+	@PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> updateStockPrice(@PathVariable("id") long id, Stock stock) throws InterruptedException {
 		log.info("Updating Stock with id {}", id);
-
-		com.dhirendra.entity.Stock currentStock = stockService.getSingleStock(id);
-
-		if (currentStock == null) {
-			log.error("Unable to update. Stock with id {} not found.", id);
-			return createResponse(currentStock, HttpStatus.NOT_FOUND);
+		Stock updatedStock;
+		try {
+			updatedStock = stockService.updateStockPrice(id, stock);
+		} catch (InterruptedException e) {
+			throw e;
 		}
-
-		currentStock.setCurrentPrice(price);
-		stockService.updatePrice(currentStock);
-		return createResponse(currentStock, HttpStatus.OK);
+		return createResponse(updatedStock, HttpStatus.OK);
 
 	}
 
@@ -134,15 +131,9 @@ public class StockController extends AbstractBaseRestController {
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> removeStock(@PathVariable("id") long id) throws Exception {
-		log.info("Fetching & Deleting Stock with id {}", id);
-		Stock stock = stockService.getStock(id);
-		if (stock == null) {
-			log.error("Unable to delete. Stock with id {} not found.", id);
-			return createResponse(stock, HttpStatus.NOT_FOUND);
-		}
+		log.info("Deleting Stock with id {}", id);
 		stockService.removeStock(id);
 		return createResponse(HttpStatus.OK);
-
 	}
 
 }
