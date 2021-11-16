@@ -8,6 +8,4 @@ import com.dhirendra.entity.Stock;
 @Repository
 public interface StockRepository extends JpaRepository<Stock, Long> {
 
-	Stock findStockByName(String name);
-
 }
