@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.dhirendra.model.Stock;
+import com.dhirendra.model.StockDTO;
 import com.dhirendra.service.StockService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +61,7 @@ public class StockController {
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<?> createNewStock(@Valid @RequestBody Stock stock) {
+	public ResponseEntity<?> createNewStock(@Valid @RequestBody StockDTO stock) {
 		log.info("inside stock create method :");
 		com.dhirendra.entity.Stock newStock = stockService.addStock(stock);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newStock.getId())
@@ -94,7 +94,7 @@ public class StockController {
 
 	@PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<?> updateStockPrice(@RequestBody Stock stock, @PathVariable Long id)
+	public ResponseEntity<?> updateStockPrice(@RequestBody StockDTO stock, @PathVariable Long id)
 			throws InterruptedException {
 		log.info("Updating Stock with id {}", id);
 		return ResponseEntity.ok().body(stockService.updateStock(id, stock));
