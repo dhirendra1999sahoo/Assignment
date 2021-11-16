@@ -94,7 +94,6 @@ public class StockService {
 		try {
 			TimeUnit.MINUTES.sleep(5);
 			stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException(id));
-
 			stockRepository.deleteById(id);
 
 		} catch (StockException e) {
@@ -109,14 +108,25 @@ public class StockService {
 		return stockRepository.findStockByName(stock.getName()) != null;
 	}
 
+	/**
+	 * 
+	 * Update Stock price
+	 * 
+	 * @param id
+	 * @param currentStock
+	 * @return
+	 * @throws InterruptedException
+	 */
+
 	@Transactional
-	public com.dhirendra.model.Stock updatePrice(Long id, Stock currentStock) throws InterruptedException {
+	public com.dhirendra.model.Stock updateStockPrice(Long id, com.dhirendra.model.Stock currentStock) throws InterruptedException {
 		Stock stock;
 		try {
 			TimeUnit.MINUTES.sleep(5);
 			stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException(id));
-			currentStock.setId(id);
-			stock = stockRepository.save(currentStock);
+			Stock newStock = conversionService.convert(currentStock, Stock.class);
+			newStock.setId(id);
+			stock = stockRepository.save(newStock);
 
 		} catch (StockException e) {
 			throw e;
