@@ -15,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 import com.dhirendra.entity.Stock;
 import com.dhirendra.exception.StockException;
 import com.dhirendra.exception.StockNotFoundException;
+import com.dhirendra.model.StockDTO;
 import com.dhirendra.repository.StockRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,14 +43,13 @@ public class StockService {
 	 * @return
 	 */
 	@Transactional
-	public List<com.dhirendra.model.Stock> getAllStocks() {
-		List<com.dhirendra.model.Stock> stocks = new ArrayList<>();
+	public List<StockDTO> getAllStocks() {
+		List<StockDTO> stocks = new ArrayList<>();
 		try {
 			List<Stock> listStocks = stockRepository.findAll();
 
 			if (!CollectionUtils.isEmpty(listStocks)) {
-				listStocks.stream()
-						.forEach(obj -> stocks.add(conversionService.convert(obj, com.dhirendra.model.Stock.class)));
+				listStocks.stream().forEach(obj -> stocks.add(conversionService.convert(obj, StockDTO.class)));
 
 			}
 		} catch (StockException e) {
@@ -70,12 +70,12 @@ public class StockService {
 	 */
 
 	@Transactional
-	public com.dhirendra.model.Stock getStock(long id) {
-		com.dhirendra.model.Stock stock = null;
+	public StockDTO getStock(long id) {
+		StockDTO stock = null;
 		try {
 			Optional<Stock> singleStock = stockRepository.findById(id);
 			if (singleStock.isPresent()) {
-				stock = conversionService.convert(singleStock.get(), com.dhirendra.model.Stock.class);
+				stock = conversionService.convert(singleStock.get(), StockDTO.class);
 			}
 		} catch (StockException e) {
 			log.error("getStock :: There was an StockException exception in the Stock service");
@@ -113,12 +113,13 @@ public class StockService {
 	/**
 	 * 
 	 * Add new Stock
+	 * 
 	 * @param stock
 	 * @return
 	 */
 
 	@Transactional
-	public Stock addStock(com.dhirendra.model.Stock stock) {
+	public Stock addStock(StockDTO stock) {
 		return stockRepository.save(conversionService.convert(stock, Stock.class));
 	}
 
@@ -133,8 +134,7 @@ public class StockService {
 	 */
 
 	@Transactional
-	public com.dhirendra.model.Stock updateStock(Long id, com.dhirendra.model.Stock currentStock)
-			throws InterruptedException {
+	public StockDTO updateStock(Long id, StockDTO currentStock) throws InterruptedException {
 		Stock stock;
 		try {
 			TimeUnit.MINUTES.sleep(5);
@@ -149,8 +149,8 @@ public class StockService {
 			throw e;
 		}
 
-		return conversionService.convert(stock, com.dhirendra.model.Stock.class);
+		return conversionService.convert(stock, StockDTO.class);
 
 	}
-	
+
 }
