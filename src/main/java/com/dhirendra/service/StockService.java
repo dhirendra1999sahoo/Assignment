@@ -36,6 +36,11 @@ public class StockService {
 	@Autowired
 	private ConversionService conversionService;
 
+	/**
+	 * Retrieve all stocks
+	 * 
+	 * @return
+	 */
 	@Transactional
 	public List<com.dhirendra.model.Stock> getAllStocks() {
 		List<com.dhirendra.model.Stock> stocks = new ArrayList<>();
@@ -57,11 +62,12 @@ public class StockService {
 		return stocks;
 	}
 
-	@Transactional
-	public Stock addStock(com.dhirendra.model.Stock stock) {
-		return stockRepository.save(conversionService.convert(stock, Stock.class));
-
-	}
+	/**
+	 * Retrieve only single stock by Id
+	 * 
+	 * @param id
+	 * @return
+	 */
 
 	@Transactional
 	public com.dhirendra.model.Stock getStock(long id) {
@@ -104,8 +110,16 @@ public class StockService {
 
 	}
 
-	public boolean isStockExist(com.dhirendra.model.Stock stock) {
-		return stockRepository.findStockByName(stock.getName()) != null;
+	/**
+	 * 
+	 * Add new Stock
+	 * @param stock
+	 * @return
+	 */
+
+	@Transactional
+	public Stock addStock(com.dhirendra.model.Stock stock) {
+		return stockRepository.save(conversionService.convert(stock, Stock.class));
 	}
 
 	/**
@@ -119,7 +133,8 @@ public class StockService {
 	 */
 
 	@Transactional
-	public com.dhirendra.model.Stock updateStockPrice(Long id, com.dhirendra.model.Stock currentStock) throws InterruptedException {
+	public com.dhirendra.model.Stock updateStock(Long id, com.dhirendra.model.Stock currentStock)
+			throws InterruptedException {
 		Stock stock;
 		try {
 			TimeUnit.MINUTES.sleep(5);
@@ -137,9 +152,5 @@ public class StockService {
 		return conversionService.convert(stock, com.dhirendra.model.Stock.class);
 
 	}
-
-	public Stock getSingleStock(long id) {
-
-		return stockRepository.getById(id);
-	}
+	
 }
