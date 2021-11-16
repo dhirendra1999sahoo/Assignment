@@ -1,11 +1,10 @@
 package com.dhirendra.controller;
 
-import java.util.List;
+import java.net.URI;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.dhirendra.model.Stock;
 import com.dhirendra.service.StockService;
@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/api/stocks")
-public class StockController extends AbstractBaseRestController {
+public class StockController {
 
 	@Autowired
 	private StockService stockService;
@@ -45,13 +45,10 @@ public class StockController extends AbstractBaseRestController {
 	 * @return
 	 */
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getStocks() {
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<?> getAllStocks() {
 		log.info("Get all the Stocks :");
-		List<Stock> stocks = stockService.getAllStocks();
-		if (stocks.isEmpty()) {
-			return createResponse(HttpStatus.NOT_FOUND);
-		}
-		return createResponse(stocks, HttpStatus.OK);
+		return ResponseEntity.ok().body(stockService.getAllStocks());
 	}
 
 	/**
@@ -63,18 +60,13 @@ public class StockController extends AbstractBaseRestController {
 	 */
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> addStock(@Valid @RequestBody Stock stock, UriComponentsBuilder ucBuilder) {
-		log.info("inside stock adding method :");
-		if (stockService.isStockExist(stock)) {
-			log.error("Unable to create. A Stock with name {} already exist", stock.getName());
-			return createResponse(stock, HttpStatus.CONFLICT);
-		}
-
+	@ResponseStatus(HttpStatus.CREATED)
+	public ResponseEntity<?> createNewStock(@Valid @RequestBody Stock stock) {
+		log.info("inside stock create method :");
 		com.dhirendra.entity.Stock newStock = stockService.addStock(stock);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setLocation(ucBuilder.path("/api/stocks/{id}").buildAndExpand(newStock.getId()).toUri());
-		return createResponse(headers, HttpStatus.CREATED);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newStock.getId())
+				.toUri();
+		return ResponseEntity.created(uri).body(newStock);
 
 	}
 
@@ -84,18 +76,11 @@ public class StockController extends AbstractBaseRestController {
 	 * @param id
 	 * @return
 	 */
-
 	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getStock(@PathVariable("id") long id) {
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<?> getStock(@PathVariable("id") Long id) {
 		log.info("Fetching Stock with id {}", id);
-		Stock stock = stockService.getStock(id);
-
-		if (stock == null) {
-			log.error("Stock with id {} not found.", id);
-			return createResponse(stock, HttpStatus.NOT_FOUND);
-		}
-		return createResponse(stock, HttpStatus.OK);
-
+		return ResponseEntity.ok().body(stockService.getStock(id));
 	}
 
 	/**
@@ -108,15 +93,11 @@ public class StockController extends AbstractBaseRestController {
 	 */
 
 	@PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> updateStockPrice(@PathVariable("id") long id, Stock stock) throws InterruptedException {
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<?> updateStockPrice(@RequestBody Stock stock, @PathVariable Long id)
+			throws InterruptedException {
 		log.info("Updating Stock with id {}", id);
-		Stock updatedStock;
-		try {
-			updatedStock = stockService.updateStockPrice(id, stock);
-		} catch (InterruptedException e) {
-			throw e;
-		}
-		return createResponse(updatedStock, HttpStatus.OK);
+		return ResponseEntity.ok().body(stockService.updateStock(id, stock));
 
 	}
 
@@ -128,12 +109,11 @@ public class StockController extends AbstractBaseRestController {
 	 * @return
 	 * @throws Exception
 	 */
-
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> removeStock(@PathVariable("id") long id) throws Exception {
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void removeStock(@PathVariable("id") Long id) throws Exception {
 		log.info("Deleting Stock with id {}", id);
 		stockService.removeStock(id);
-		return createResponse(HttpStatus.OK);
 	}
 
 }
