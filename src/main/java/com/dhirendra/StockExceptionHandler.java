@@ -60,4 +60,19 @@ public class StockExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<>(stockException.getMessage(), HttpStatus.NO_CONTENT);
 
 	}
+
+	/**
+	 * Handle All InterruptedException thrown by the application
+	 *
+	 * @param interruptedException - the application specific exception
+	 * @param request              - the WebRequest
+	 * @return {@link ResponseEntity} - the ResResponseEntity
+	 */
+	@ExceptionHandler({ InterruptedException.class })
+	public ResponseEntity<?> handleRefException(final InterruptedException interruptedException) {
+		logger.debug("handleRefException :: there was an InterruptedException", interruptedException);
+
+		return new ResponseEntity<>(interruptedException.getMessage(), HttpStatus.NO_CONTENT);
+
+	}
 }
