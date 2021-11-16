@@ -1,5 +1,6 @@
 package com.dhirendra.entity;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Entity;
@@ -14,8 +15,12 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Stock {
+public class Stock implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 286850869828709792L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
