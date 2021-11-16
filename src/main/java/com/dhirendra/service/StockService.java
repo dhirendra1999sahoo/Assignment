@@ -14,6 +14,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.dhirendra.entity.Stock;
 import com.dhirendra.exception.StockException;
+import com.dhirendra.exception.StockNotFoundException;
 import com.dhirendra.repository.StockRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -81,10 +82,19 @@ public class StockService {
 
 	}
 
+	/**
+	 * delete Stock
+	 * 
+	 * @param id
+	 * @throws InterruptedException
+	 */
+
 	@Transactional
 	public void removeStock(long id) throws InterruptedException {
 		try {
 			TimeUnit.MINUTES.sleep(5);
+			stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException(id));
+
 			stockRepository.deleteById(id);
 
 		} catch (StockException e) {
@@ -100,8 +110,20 @@ public class StockService {
 	}
 
 	@Transactional
-	public com.dhirendra.model.Stock updatePrice(Stock currentStock) {
-		Stock stock = stockRepository.save(currentStock);
+	public com.dhirendra.model.Stock updatePrice(Long id, Stock currentStock) throws InterruptedException {
+		Stock stock;
+		try {
+			TimeUnit.MINUTES.sleep(5);
+			stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException(id));
+			currentStock.setId(id);
+			stock = stockRepository.save(currentStock);
+
+		} catch (StockException e) {
+			throw e;
+		} catch (Exception e) {
+			throw e;
+		}
+
 		return conversionService.convert(stock, com.dhirendra.model.Stock.class);
 
 	}
