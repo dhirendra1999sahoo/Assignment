@@ -4,11 +4,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.dhirendra.exception.StockException;
+import com.dhirendra.exception.StockNotFoundException;
 
 /**
  * Exception handler class All Exceptions are handled in this class. All
@@ -17,6 +18,7 @@ import com.dhirendra.exception.StockException;
  * @author
  *
  */
+@ControllerAdvice
 public class StockExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Override
@@ -47,21 +49,6 @@ public class StockExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	/**
-	 * Handle All StockException thrown by the application
-	 *
-	 * @param stockException - the application specific exception
-	 * @param request        - the WebRequest
-	 * @return {@link ResponseEntity} - the ResResponseEntity
-	 */
-	@ExceptionHandler({ StockException.class })
-	public ResponseEntity<?> handleRefException(final StockException stockException) {
-		logger.debug("handleRefException :: there was an StockException", stockException);
-
-		return new ResponseEntity<>(stockException.getMessage(), HttpStatus.NO_CONTENT);
-
-	}
-
-	/**
 	 * Handle All InterruptedException thrown by the application
 	 *
 	 * @param interruptedException - the application specific exception
@@ -73,6 +60,14 @@ public class StockExceptionHandler extends ResponseEntityExceptionHandler {
 		logger.debug("handleRefException :: there was an InterruptedException", interruptedException);
 
 		return new ResponseEntity<>(interruptedException.getMessage(), HttpStatus.NO_CONTENT);
+
+	}
+
+	@ExceptionHandler({ StockNotFoundException.class })
+	public ResponseEntity<?> handleRefException(final StockNotFoundException stockNotFoundException) {
+		logger.debug("handleRefException :: there was an StockNotFoundException", stockNotFoundException);
+
+		return new ResponseEntity<>(stockNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
 
 	}
 }
