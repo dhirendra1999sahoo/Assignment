@@ -2,7 +2,6 @@ package com.dhirendra.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.transaction.Transactional;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.dhirendra.entity.Stock;
-import com.dhirendra.exception.StockException;
 import com.dhirendra.exception.StockNotFoundException;
 import com.dhirendra.model.StockDTO;
 import com.dhirendra.repository.StockRepository;
@@ -42,7 +40,7 @@ public class StockService {
 	 * 
 	 * @return
 	 */
-	@Transactional
+
 	public List<StockDTO> getAllStocks() {
 		List<StockDTO> stocks = new ArrayList<>();
 		try {
@@ -52,7 +50,7 @@ public class StockService {
 				listStocks.stream().forEach(obj -> stocks.add(conversionService.convert(obj, StockDTO.class)));
 
 			}
-		} catch (StockException e) {
+		} catch (StockNotFoundException e) {
 			log.error("getAllStocks :: There was an StockException exception in the Stock service");
 			throw e;
 		} catch (Exception e) {
@@ -69,15 +67,14 @@ public class StockService {
 	 * @return
 	 */
 
-	@Transactional
 	public StockDTO getStock(long id) {
 		StockDTO stock = null;
 		try {
-			Optional<Stock> singleStock = stockRepository.findById(id);
-			if (singleStock.isPresent()) {
-				stock = conversionService.convert(singleStock.get(), StockDTO.class);
+			Stock singleStock = stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException(id));
+			if (singleStock != null) {
+				stock = conversionService.convert(singleStock, StockDTO.class);
 			}
-		} catch (StockException e) {
+		} catch (StockNotFoundException e) {
 			log.error("getStock :: There was an StockException exception in the Stock service");
 			throw e;
 		} catch (Exception e) {
@@ -95,14 +92,14 @@ public class StockService {
 	 * @throws InterruptedException
 	 */
 
-	@Transactional
+	@Transactional(rollbackOn = Exception.class)
 	public void removeStock(long id) throws InterruptedException {
 		try {
 			TimeUnit.MINUTES.sleep(5);
 			stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException(id));
 			stockRepository.deleteById(id);
 
-		} catch (StockException e) {
+		} catch (StockNotFoundException e) {
 			throw e;
 		} catch (Exception e) {
 			throw e;
@@ -118,9 +115,17 @@ public class StockService {
 	 * @return
 	 */
 
-	@Transactional
-	public Stock addStock(StockDTO stock) {
-		return stockRepository.save(conversionService.convert(stock, Stock.class));
+	@Transactional(rollbackOn = Exception.class)
+	public Stock addStock(StockDTO stockDto) {
+		Stock stock;
+		try {
+			stock = stockRepository.save(conversionService.convert(stockDto, Stock.class));
+		} catch (StockNotFoundException e) {
+			throw e;
+		} catch (Exception e) {
+			throw e;
+		}
+		return stock;
 	}
 
 	/**
@@ -133,23 +138,19 @@ public class StockService {
 	 * @throws InterruptedException
 	 */
 
-	@Transactional
-	public StockDTO updateStock(Long id, StockDTO currentStock) throws InterruptedException {
-		Stock stock;
+	@Transactional(rollbackOn = Exception.class)
+	public void updateStock(Long id, StockDTO currentStock) throws InterruptedException {
 		try {
 			TimeUnit.MINUTES.sleep(5);
 			stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException(id));
 			Stock newStock = conversionService.convert(currentStock, Stock.class);
 			newStock.setId(id);
-			stock = stockRepository.save(newStock);
 
-		} catch (StockException e) {
+		} catch (StockNotFoundException e) {
 			throw e;
 		} catch (Exception e) {
 			throw e;
 		}
-
-		return conversionService.convert(stock, StockDTO.class);
 
 	}
 
