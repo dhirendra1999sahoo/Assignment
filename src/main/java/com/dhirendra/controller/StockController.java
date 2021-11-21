@@ -97,7 +97,7 @@ public class StockController {
 	public ResponseEntity<?> updateStockPrice(@RequestBody StockDTO stock, @PathVariable Long id)
 			throws InterruptedException {
 		log.info("Updating Stock with id {}", id);
-		return ResponseEntity.ok().body(stockService.updateStock(id, stock));
+		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
 
