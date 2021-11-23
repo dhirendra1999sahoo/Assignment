@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -92,11 +93,12 @@ public class StockController {
 	 * @throws InterruptedException
 	 */
 
-	@PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<?> updateStockPrice(@RequestBody StockDTO stock, @PathVariable Long id)
+	public ResponseEntity<?> updateStockPrice(@Valid @RequestParam Double price, @PathVariable Long id)
 			throws InterruptedException {
 		log.info("Updating Stock with id {}", id);
+		stockService.updateStock(id, price);
 		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
