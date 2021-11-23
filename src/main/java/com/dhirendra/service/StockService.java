@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import com.dhirendra.entity.Stock;
@@ -92,10 +92,9 @@ public class StockService {
 	 * @throws InterruptedException
 	 */
 
-	@Transactional(rollbackOn = Exception.class)
+	@Transactional(rollbackFor = Exception.class)
 	public void removeStock(long id) throws InterruptedException {
 		try {
-			TimeUnit.MINUTES.sleep(5);
 			stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException(id));
 			stockRepository.deleteById(id);
 
@@ -115,7 +114,7 @@ public class StockService {
 	 * @return
 	 */
 
-	@Transactional(rollbackOn = Exception.class)
+	@Transactional(rollbackFor = Exception.class)
 	public Stock addStock(StockDTO stockDto) {
 		Stock stock;
 		try {
@@ -138,14 +137,12 @@ public class StockService {
 	 * @throws InterruptedException
 	 */
 
-	@Transactional(rollbackOn = Exception.class)
-	public void updateStock(Long id, StockDTO currentStock) throws InterruptedException {
+	@Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+	public void updateStock(Long id, Double price) throws InterruptedException {
 		try {
-			TimeUnit.MINUTES.sleep(5);
-			stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException(id));
-			Stock newStock = conversionService.convert(currentStock, Stock.class);
-			newStock.setId(id);
-
+			Stock stock = stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException(id));
+			stock.setCurrentPrice(price);
+			stockRepository.save(stock);
 		} catch (StockNotFoundException e) {
 			throw e;
 		} catch (Exception e) {
